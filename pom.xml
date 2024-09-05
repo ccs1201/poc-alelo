@@ -15,6 +15,10 @@
     <name>poc-alelo</name>
     <description>poc-alelo - Mais Clientes com RabbitMQ</description>
 
+    <properties>
+        <java.version>21</java.version>
+    </properties>
+
     <modules>
         <module>clients</module>
         <module>server</module>
@@ -22,9 +26,6 @@
         <module>pagamento-negado</module>
     </modules>
 
-    <properties>
-        <java.version>21</java.version>
-    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

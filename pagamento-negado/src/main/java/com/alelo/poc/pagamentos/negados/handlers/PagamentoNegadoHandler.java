@@ -10,17 +10,13 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 @Component
-@RabbitListener(queues = PagamentoConstants.QUEUE_PAGAMENTO_NEGADO)
+@RabbitListener(queues = PagamentoConstants.QUEUE_PAGAMENTO_NEGADO, concurrency = "10")
 @RequiredArgsConstructor
 @Slf4j
 public class PagamentoNegadoHandler {
 
     @RabbitHandler
     public void handle(PagamentoEvent event) {
-        try {
             log.info("Evento recebido: {}", event);
-        } catch (Exception e) {
-            log.error("Erro ao processar evento: {}", event, e);
-        }
     }
 }

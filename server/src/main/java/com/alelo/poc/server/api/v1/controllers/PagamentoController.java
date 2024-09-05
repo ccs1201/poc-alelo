@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+
 @RestController
 @RequestMapping("/pagamentos")
 @RequiredArgsConstructor
@@ -20,9 +23,11 @@ public class PagamentoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void criarPagamento() {
-        log.info("Criando pagamento");
-        service.processarPagamento();
+    public CompletableFuture<Void> criarPagamento() {
+        return CompletableFuture.runAsync(service::processarPagamento,
+                Executors.newVirtualThreadPerTaskExecutor()
+//                Executors.newFixedThreadPool(400)
+        );
     }
 
 }

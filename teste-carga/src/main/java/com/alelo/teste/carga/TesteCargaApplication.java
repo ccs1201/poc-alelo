@@ -1,20 +1,24 @@
 package com.alelo.teste.carga;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 @SpringBootApplication
-@Slf4j
 public class TesteCargaApplication {
 
-    private static final int QTD_TESTS = 10_000;
+    private static final Logger log = Logger.getLogger(TesteCargaApplication.class.getName());
+    private static final int DURACAO_TESTE = 300;
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     public static void main(String[] args) {
         SpringApplication.run(TesteCargaApplication.class, args);
@@ -25,25 +29,38 @@ public class TesteCargaApplication {
         return RestClient.create("http://localhost:8080/pagamentos");
     }
 
+
     @Bean
     public CommandLineRunner run(RestClient restClient) {
+        var futures = new ArrayList<CompletableFuture<Void>>();
 
-        var futures = new CompletableFuture[QTD_TESTS];
+        var randon = new SecureRandom();
 
         log.info("Iniciando carga de teste");
 
+        var tempoFinal = System.currentTimeMillis() + (DURACAO_TESTE * 1000);
+        AtomicInteger requestNumber = new AtomicInteger(0);
+
         return args -> {
-            for (int i = 0; i < QTD_TESTS; i++) {
-                final int requestNumber = i;
-                futures[i] = CompletableFuture.runAsync(() ->
-                                restClient.post().retrieve().onStatus(status -> true,
-                                        (request, response) ->
-                                                log.info("Request {} status: {}", requestNumber, response.getStatusCode()))
-                        , Executors.newVirtualThreadPerTaskExecutor());
+            while (System.currentTimeMillis() < tempoFinal){
+                Thread.sleep(randon.nextInt(3));
+                futures.add(CompletableFuture.runAsync(() -> {
+                            try {
+                                var response = restClient.post().retrieve();
+                                counter.incrementAndGet();
+
+                                log.info("Request %d status: %s".formatted(requestNumber.incrementAndGet(),
+                                        response.toBodilessEntity().getStatusCode()));
+                            } catch (Exception e) {
+                                log.info(e.getMessage().concat(String.valueOf(requestNumber.incrementAndGet())));
+                            }
+                        }
+                        , Executors.newVirtualThreadPerTaskExecutor()));
+
             }
 
-            CompletableFuture.allOf(futures).join();
-            log.info("Carga finalizada");
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+            log.info("Teste Carga finalizado Respostas recebidas %d".formatted(counter.get()));
             System.exit(0);
         };
     }

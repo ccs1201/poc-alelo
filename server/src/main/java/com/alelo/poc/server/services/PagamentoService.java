@@ -13,8 +13,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -23,13 +23,14 @@ public class PagamentoService {
 
     private final RabbitTemplate rabbitTemplate;
     private final Map<String, Integer> pagamentos = new ConcurrentHashMap<>();
-    private static final Random random = new Random();
+    private final AtomicInteger contador = new AtomicInteger(0);
 
     @PreDestroy
 
     public void init() {
         log.info("Pagamentos aprovados: {}", pagamentos.get("aprovados"));
         log.info("Pagamentos negados: {}", pagamentos.get("negados"));
+        log.info("Total: {}", pagamentos.get("negados") + pagamentos.get("aprovados"));
     }
 
 
@@ -49,12 +50,12 @@ public class PagamentoService {
         log.info("Pagamento negado: {}", pagamento);
     }
 
-    private boolean aprovarPagamento() {
+    private static boolean aprovarPagamento() {
         return Math.random() > 0.5;
     }
 
-    private static PagamentoEvent criarPagamento() {
-        return new PagamentoEvent(random.nextInt(),
+    private PagamentoEvent criarPagamento() {
+        return new PagamentoEvent(contador.incrementAndGet(),
                 "Teste poc alelo",
                 gerarValorAleotorio(),
                 OffsetDateTime.now());
