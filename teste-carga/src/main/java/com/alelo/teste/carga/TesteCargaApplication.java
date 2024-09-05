@@ -17,10 +17,11 @@ import java.util.logging.Logger;
 public class TesteCargaApplication {
 
     private static final Logger log = Logger.getLogger(TesteCargaApplication.class.getName());
-    private static final int DURACAO_TESTE = 300;
+    private static int duracaoTeste = 10;
     private final AtomicInteger counter = new AtomicInteger(0);
 
     public static void main(String[] args) {
+        duracaoTeste = args.length > 0 ? Integer.parseInt(args[0]) : duracaoTeste;
         SpringApplication.run(TesteCargaApplication.class, args);
     }
 
@@ -38,12 +39,12 @@ public class TesteCargaApplication {
 
         log.info("Iniciando carga de teste");
 
-        var tempoFinal = System.currentTimeMillis() + (DURACAO_TESTE * 1000);
+        var tempoFinal = System.currentTimeMillis() + (duracaoTeste * 1000);
         AtomicInteger requestNumber = new AtomicInteger(0);
 
         return args -> {
             while (System.currentTimeMillis() < tempoFinal){
-                Thread.sleep(randon.nextInt(3));
+                Thread.sleep(randon.nextInt(2));
                 futures.add(CompletableFuture.runAsync(() -> {
                             try {
                                 var response = restClient.post().retrieve();
