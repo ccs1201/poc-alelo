@@ -18,10 +18,12 @@ public class TesteCargaApplication {
 
     private static final Logger log = Logger.getLogger(TesteCargaApplication.class.getName());
     private static int duracaoTeste = 10;
+    private static int sleepTime = 2;
     private final AtomicInteger counter = new AtomicInteger(0);
 
     public static void main(String[] args) {
         duracaoTeste = args.length > 0 ? Integer.parseInt(args[0]) : duracaoTeste;
+        sleepTime = args.length > 1 ? Integer.parseInt(args[1]) : sleepTime;
         SpringApplication.run(TesteCargaApplication.class, args);
     }
 
