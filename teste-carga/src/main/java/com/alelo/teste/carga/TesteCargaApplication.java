@@ -1,5 +1,6 @@
 package com.alelo.teste.carga;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,12 +12,11 @@ import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Logger;
 
 @SpringBootApplication
+@Slf4j
 public class TesteCargaApplication {
 
-    private static final Logger log = Logger.getLogger(TesteCargaApplication.class.getName());
     private static int duracaoTeste = 10;
     private static int sleepTime = 2;
     private final AtomicInteger counter = new AtomicInteger(0);
@@ -41,7 +41,7 @@ public class TesteCargaApplication {
 
         log.info("Iniciando carga de teste");
 
-        var tempoFinal = System.currentTimeMillis() + (duracaoTeste * 1000);
+        var tempoFinal = System.currentTimeMillis() + (duracaoTeste * 1000L);
         AtomicInteger requestNumber = new AtomicInteger(0);
 
         return args -> {
@@ -61,11 +61,9 @@ public class TesteCargaApplication {
                                 if (response.toBodilessEntity().getStatusCode().is2xxSuccessful()) {
                                     counter.incrementAndGet();
                                 }
-
-                                log.info("Request %d status: %s".formatted(requestNumber.incrementAndGet(),
-                                        response.toBodilessEntity().getStatusCode()));
+                                log.info("Request {} status: {}", requestNumber.incrementAndGet(), response.toBodilessEntity().getStatusCode());
                             } catch (Exception e) {
-                                log.info(e.getMessage().concat(String.valueOf(" " + requestNumber.incrementAndGet())));
+                                log.info(e.getMessage().concat(" " + requestNumber.incrementAndGet()));
                             }
                         }
                         , Executors.newVirtualThreadPerTaskExecutor()));
@@ -73,7 +71,8 @@ public class TesteCargaApplication {
             }
 
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-            log.info("Teste carga finalizado. Respostas de sucesso recebidas %d".formatted(counter.get()));
+            log.info("Teste carga finalizado.");
+            log.info("Respostas de sucesso recebidas {}", (counter.get()));
             System.exit(0);
         };
     }

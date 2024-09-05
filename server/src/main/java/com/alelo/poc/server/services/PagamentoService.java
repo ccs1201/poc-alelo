@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.security.SecureRandom;
 import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,6 +26,7 @@ public class PagamentoService {
     private final RabbitTemplate rabbitTemplate;
     private final Map<String, Integer> pagamentos = new ConcurrentHashMap<>();
     private final AtomicInteger contador = new AtomicInteger(0);
+    private static final Random random = new SecureRandom();
 
     @PreDestroy
 
@@ -51,7 +54,7 @@ public class PagamentoService {
     }
 
     private static boolean aprovarPagamento() {
-        return Math.random() > 0.5;
+        return random.nextBoolean();
     }
 
     private PagamentoEvent criarPagamento() {
