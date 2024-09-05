@@ -45,17 +45,27 @@ public class TesteCargaApplication {
         AtomicInteger requestNumber = new AtomicInteger(0);
 
         return args -> {
-            while (System.currentTimeMillis() < tempoFinal){
-                Thread.sleep(randon.nextInt(sleepTime));
+            while (System.currentTimeMillis() < tempoFinal) {
+                var sleep = randon.nextInt(sleepTime);
+
+                if (sleep > 0) {
+                    Thread.sleep(sleep);
+                } else {
+                    Thread.sleep(0, randon.nextInt(250_000, 999_999));
+                }
+
                 futures.add(CompletableFuture.runAsync(() -> {
                             try {
                                 var response = restClient.post().retrieve();
-                                counter.incrementAndGet();
+
+                                if (response.toBodilessEntity().getStatusCode().is2xxSuccessful()) {
+                                    counter.incrementAndGet();
+                                }
 
                                 log.info("Request %d status: %s".formatted(requestNumber.incrementAndGet(),
                                         response.toBodilessEntity().getStatusCode()));
                             } catch (Exception e) {
-                                log.info(e.getMessage().concat(String.valueOf(requestNumber.incrementAndGet())));
+                                log.info(e.getMessage().concat(String.valueOf(" " + requestNumber.incrementAndGet())));
                             }
                         }
                         , Executors.newVirtualThreadPerTaskExecutor()));
@@ -63,7 +73,7 @@ public class TesteCargaApplication {
             }
 
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-            log.info("Teste Carga finalizado Respostas recebidas %d".formatted(counter.get()));
+            log.info("Teste carga finalizado. Respostas de sucesso recebidas %d".formatted(counter.get()));
             System.exit(0);
         };
     }
