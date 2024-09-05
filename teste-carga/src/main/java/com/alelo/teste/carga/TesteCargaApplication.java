@@ -46,7 +46,7 @@ public class TesteCargaApplication {
 
         return args -> {
             while (System.currentTimeMillis() < tempoFinal){
-                Thread.sleep(0,randon.nextInt(999_999));
+                Thread.sleep(0,randon.nextInt(sleepTime));
                 futures.add(CompletableFuture.runAsync(() -> {
                             try {
                                 var response = restClient.post().retrieve();
