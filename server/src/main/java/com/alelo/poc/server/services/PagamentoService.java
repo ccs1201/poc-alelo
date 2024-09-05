@@ -29,28 +29,29 @@ public class PagamentoService {
     private static final Random random = new SecureRandom();
 
     @PreDestroy
-
-    public void init() {
+    public void preDestroy() {
         log.info("Pagamentos aprovados: {}", pagamentos.get("aprovados"));
         log.info("Pagamentos negados: {}", pagamentos.get("negados"));
         log.info("Total: {}", pagamentos.get("negados") + pagamentos.get("aprovados"));
     }
 
 
-    public void processarPagamento() {
+    public boolean processarPagamento() {
 
         var pagamento = criarPagamento();
 
         if (aprovarPagamento()) {
-            pagamentos.compute("aprovados", (k, v) -> v == null ? 1 : v + 1);
             rabbitTemplate.convertAndSend(PagamentoConstants.QUEUE_PAGAMENTOS_APROVADOS, pagamento);
             log.info("Pagamento aprovado: {}", pagamento);
-            return;
+            pagamentos.compute("aprovados", (k, v) -> v == null ? 1 : v + 1);
+            return true;
         }
 
-        pagamentos.compute("negados", (k, v) -> v == null ? 1 : v + 1);
         rabbitTemplate.convertAndSend(PagamentoConstants.QUEUE_PAGAMENTO_NEGADO, pagamento);
         log.info("Pagamento negado: {}", pagamento);
+        pagamentos.compute("negados", (k, v) -> v == null ? 1 : v + 1);
+
+        return false;
     }
 
     private static boolean aprovarPagamento() {

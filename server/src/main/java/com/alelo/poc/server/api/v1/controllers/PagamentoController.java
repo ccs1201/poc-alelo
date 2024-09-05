@@ -4,14 +4,12 @@ package com.alelo.poc.server.api.v1.controllers;
 import com.alelo.poc.server.services.PagamentoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/pagamentos")
@@ -19,15 +17,17 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class PagamentoController {
 
+    @Value("${spring.mvc.async.request-timeout}")
+    private long requestTimeout;
+
     private final PagamentoService service;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CompletableFuture<Void> criarPagamento() {
-        return CompletableFuture.runAsync(service::processarPagamento,
-                Executors.newVirtualThreadPerTaskExecutor()
-//                Executors.newFixedThreadPool(400)
-        );
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Boolean criarPagamento() {
+//        return CompletableFuture.supplyAsync(
+        return service.processarPagamento();
+//                Executors.newVirtualThreadPerTaskExecutor()
+//        ).orTimeout((requestTimeout), TimeUnit.MILLISECONDS);
     }
-
 }

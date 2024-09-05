@@ -1,0 +1,71 @@
+name: 'poc-alelo-test'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3.13.6-management-alpine
+    restart: no
+    container_name: 'rabbitmq-poc-test'
+    hostname: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512MB'
+    networks:
+      - poc-alelo
+
+  server:
+    image: couza-server
+    restart: no
+    depends_on:
+      - rabbitmq
+#    container_name: 'server'
+    ports:
+      - 8080:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '2GB'
+    networks:
+      - poc-alelo
+
+  aprovados:
+    image: couza-pagamento-aprovado
+    restart: no
+    depends_on:
+      - rabbitmq
+#    container_name: 'pagamento-aprovado'
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512MB'
+    networks:
+      - poc-alelo
+
+  negados:
+    image: couza-pagamento-negado
+    restart: no
+    depends_on:
+      - rabbitmq
+#    container_name: 'pagamento-negado'
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512MB'
+    networks:
+      - poc-alelo
+
+networks:
+  poc-alelo:
+    name: 'poc-alelo-network'
+
