@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TesteCargaApplication {
 
     private static int duracaoTeste = 10;
-    private static int threadPoolSize = 50;
+    private static int threadPoolSize = 25;
     private static final AtomicInteger counter = new AtomicInteger(0);
 
     public static void main(String[] args) {
@@ -57,7 +57,7 @@ public class TesteCargaApplication {
                         log.info(e.getMessage().concat(" " + requestNumber.incrementAndGet()));
                     }
                 }, executor));
-
+                Thread.sleep(0, 100_000);
             }
 
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
