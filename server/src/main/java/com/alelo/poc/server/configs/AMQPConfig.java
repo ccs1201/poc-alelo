@@ -17,7 +17,7 @@ public class AMQPConfig {
 
     private static Queue buildQueue(String queueName) {
         return QueueBuilder
-                .nonDurable(queueName)
+                .durable(queueName)
                 .deadLetterExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLQ)
                 .ttl(10000)
                 .maxPriority(10)

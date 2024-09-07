@@ -24,6 +24,8 @@ services:
   server:
     image: couza-server
     restart: no
+    environment:
+      spring.profiles.active: prod
     depends_on:
       - rabbitmq
 #    container_name: 'server'
@@ -33,12 +35,14 @@ services:
       resources:
         limits:
           cpus: '1'
-          memory: '2GB'
+          memory: '1GB'
     networks:
       - poc-alelo
 
   aprovados:
     image: couza-pagamento-aprovado
+    environment:
+      spring.profiles.active: prod
     restart: no
     depends_on:
       - rabbitmq
@@ -53,6 +57,8 @@ services:
 
   negados:
     image: couza-pagamento-negado
+    environment:
+      spring.profiles.active: prod
     restart: no
     depends_on:
       - rabbitmq
