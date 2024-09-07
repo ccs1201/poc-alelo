@@ -16,12 +16,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class TesteCargaApplication {
 
-    private static int duracaoTeste = 10;
+    private static int qtdRequisicoes = 100;
     private static int threadPoolSize = 25;
-    private static final AtomicInteger counter = new AtomicInteger(0);
-
     public static void main(String[] args) {
-        duracaoTeste = args.length > 0 ? Integer.parseInt(args[0]) : duracaoTeste;
+        qtdRequisicoes = args.length > 0 ? Integer.parseInt(args[0]) : qtdRequisicoes;
         threadPoolSize = args.length > 1 ? Integer.parseInt(args[1]) : threadPoolSize;
         SpringApplication.run(TesteCargaApplication.class, args);
     }
@@ -31,25 +29,25 @@ public class TesteCargaApplication {
         return RestClient.create("http://localhost:8080/pagamentos");
     }
 
-
     @Bean
     public static CommandLineRunner run(RestClient restClient) {
-        var futures = new ArrayList<CompletableFuture<Void>>();
+
+        final AtomicInteger responsesRecebidas = new AtomicInteger(0);
+        final AtomicInteger requestNumber = new AtomicInteger(0);
+        final var executor = Executors.newFixedThreadPool(threadPoolSize);
+        final var futures = new ArrayList<CompletableFuture<Void>>(qtdRequisicoes);
+        final var startTime = System.currentTimeMillis();
 
         log.info("Iniciando carga de teste");
-        var tempoFinal = System.currentTimeMillis() + (duracaoTeste * 1000L);
-        AtomicInteger requestNumber = new AtomicInteger(0);
-
-        var executor = Executors.newFixedThreadPool(threadPoolSize);
 
         return args -> {
-            while (System.currentTimeMillis() < tempoFinal) {
+            for (var i = 1; i < qtdRequisicoes + 1; i++) {
                 futures.add(CompletableFuture.runAsync(() -> {
                     try {
                         var response = restClient.post().retrieve();
 
                         if (response.toBodilessEntity().getStatusCode().is2xxSuccessful()) {
-                            counter.incrementAndGet();
+                            responsesRecebidas.incrementAndGet();
                         }
                         log.info("Request {} status: {}", requestNumber.incrementAndGet(), response.toBodilessEntity().getStatusCode());
 
@@ -57,13 +55,13 @@ public class TesteCargaApplication {
                         log.info(e.getMessage().concat(" " + requestNumber.incrementAndGet()));
                     }
                 }, executor));
-                Thread.sleep(0, 100_000);
             }
 
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
             executor.shutdown();
             log.info("Teste carga finalizado.");
-            log.info("Respostas de sucesso recebidas {}", (counter.get()));
+            log.info("Tempo decorrido: {} segundos", (System.currentTimeMillis() - startTime) / 1000L);
+            log.info("Respostas de sucesso recebidas {}", (responsesRecebidas.get()));
             System.exit(0);
         };
     }

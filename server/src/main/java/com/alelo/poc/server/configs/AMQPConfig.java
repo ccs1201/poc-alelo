@@ -70,7 +70,7 @@ public class AMQPConfig {
 
     @Bean
     public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(ConnectionFactory connectionFactory,
-                                                                                     Jackson2JsonMessageConverter jackson2JsonMessageConverter) {
+                                                                                     MessageConverter jackson2JsonMessageConverter) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setMessageConverter(jackson2JsonMessageConverter);
         factory.setConnectionFactory(connectionFactory);
