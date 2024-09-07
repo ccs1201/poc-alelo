@@ -14,6 +14,8 @@ for %%M in (%MODULES%) do (
     REM Cria a tag da imagem com base no nome do módulo
     set IMAGE_NAME=!IMAGE_NAME_BASE!-%%M
 
+    docker rmi !IMAGE_NAME!:latest
+
     REM Executa o build da imagem Docker
     docker build -t !IMAGE_NAME! .
 

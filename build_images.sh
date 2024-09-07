@@ -15,6 +15,9 @@ do
     # Cria a tag da imagem com base no nome do módulo
     IMAGE_NAME="$IMAGE_NAME_BASE-$MODULE"
 
+    # Remove a imagem existente, se houver
+    docker rmi "$IMAGE_NAME":latest > /dev/null 2>&1
+
     # Executa o build da imagem Docker
     docker build -t "$IMAGE_NAME" .
 
