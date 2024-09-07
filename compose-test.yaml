@@ -7,8 +7,13 @@ services:
     restart: no
     container_name: 'rabbitmq-poc-test'
     hostname: 'rabbitmq'
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      timeout: 5s
+      interval: 2s
+      retries: 3
     ports:
-#      - 5672:5672
+      #      - 5672:5672
       - 15672:15672
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
@@ -28,7 +33,6 @@ services:
       spring.profiles.active: prod
     depends_on:
       - rabbitmq
-#    container_name: 'server'
     ports:
       - 8080:8080
     deploy:
@@ -45,8 +49,8 @@ services:
       spring.profiles.active: prod
     restart: no
     depends_on:
-      - rabbitmq
-#    container_name: 'pagamento-aprovado'
+      rabbitmq:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -61,8 +65,8 @@ services:
       spring.profiles.active: prod
     restart: no
     depends_on:
-      - rabbitmq
-#    container_name: 'pagamento-negado'
+      rabbitmq:
+        condition: service_healthy
     deploy:
       resources:
         limits:
