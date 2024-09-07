@@ -12,9 +12,16 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-
 @Configuration
 public class AMQPConfig {
+
+    private static Queue buildQueue(String queueName) {
+        return QueueBuilder
+                .durable(queueName)
+                .deadLetterExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLQ)
+                .ttl(10000)
+                .build();
+    }
 
     @Bean
     public MessageConverter jackson2JsonMessageConverter() {
@@ -33,23 +40,15 @@ public class AMQPConfig {
 
     @Bean
     public TopicExchange exchange() {
-        return ExchangeBuilder.topicExchange(PagamentoConstants.EXCHANGE_PAGAMENTOS)
+        return ExchangeBuilder
+                .topicExchange(PagamentoConstants.EXCHANGE_PAGAMENTO)
                 .durable(true)
                 .build();
     }
 
     @Bean
     public Queue queuePagamentoAprovado() {
-        return QueueBuilder
-                .durable(PagamentoConstants.QUEUE_PAGAMENTOS_APROVADOS)
-                .build();
-    }
-
-    @Bean
-    public Queue queuePagamentoNegado() {
-        return QueueBuilder
-                .durable(PagamentoConstants.QUEUE_PAGAMENTO_NEGADO)
-                .build();
+        return buildQueue(PagamentoConstants.QUEUE_PAGAMENTOS_APROVADOS);
     }
 
     @Bean
@@ -61,11 +60,39 @@ public class AMQPConfig {
     }
 
     @Bean
+    public Queue queuePagamentoNegado() {
+        return buildQueue(PagamentoConstants.QUEUE_PAGAMENTO_NEGADO);
+    }
+
+    @Bean
     public Binding bindingPagamentoNegado(Queue queuePagamentoNegado, TopicExchange exchange) {
         return BindingBuilder
                 .bind(queuePagamentoNegado)
                 .to(exchange)
                 .with(PagamentoConstants.QUEUE_PAGAMENTO_NEGADO);
+    }
+
+    @Bean
+    public FanoutExchange exchangeDLQ() {
+        return ExchangeBuilder
+                .fanoutExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLQ)
+                .durable(true)
+                .build();
+    }
+
+    @Bean
+    public Queue pagamentoDLQ() {
+        return QueueBuilder
+                .durable(PagamentoConstants.QUEUE_PAGAMENTO_DLQ)
+                .lazy()
+                .build();
+    }
+
+    @Bean
+    public Binding bindingPagamentoDLQ(Queue pagamentoDLQ, FanoutExchange exchangeDLQ) {
+        return BindingBuilder
+                .bind(pagamentoDLQ)
+                .to(exchangeDLQ);
     }
 
     @Bean
