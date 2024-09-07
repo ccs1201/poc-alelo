@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mvn package -DskipTests=true
+
 # Diretórios dos módulos
 MODULES=("pagamento-aprovado" "pagamento-negado" "server")
 
@@ -24,5 +26,7 @@ do
     # Volta para o diretório raiz
     cd ..
 done
+
+mvn clean
 
 echo "Build finalizado."

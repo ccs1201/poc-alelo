@@ -1,6 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
 
+mvn package -DskipTests=true
+
 REM Diretórios dos módulos
 set MODULES=pagamento-aprovado pagamento-negado server
 
@@ -22,5 +24,5 @@ for %%M in (%MODULES%) do (
     REM Volta para o diretório raiz
     cd ..
 )
-
+mvn clean
 echo Build finalizado.
