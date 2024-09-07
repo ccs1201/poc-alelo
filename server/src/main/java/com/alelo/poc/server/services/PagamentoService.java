@@ -35,7 +35,6 @@ public class PagamentoService {
         log.info("Total: {}", pagamentos.get("negados") + pagamentos.get("aprovados"));
     }
 
-
     public boolean processarPagamento() {
 
         var pagamento = criarPagamento();

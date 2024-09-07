@@ -8,6 +8,7 @@ import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFacto
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,14 +17,14 @@ import org.springframework.context.annotation.Configuration;
 public class AMQPConfig {
 
     @Bean
-    public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
+    public MessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter(new ObjectMapper()
                 .registerModule(new JavaTimeModule()));
     }
 
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, TopicExchange exchange,
-                                         Jackson2JsonMessageConverter jackson2JsonMessageConverter) {
+                                         MessageConverter jackson2JsonMessageConverter) {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setExchange(exchange.getName());
         template.setMessageConverter(jackson2JsonMessageConverter);
@@ -39,22 +40,32 @@ public class AMQPConfig {
 
     @Bean
     public Queue queuePagamentoAprovado() {
-        return new Queue(PagamentoConstants.QUEUE_PAGAMENTOS_APROVADOS, true);
+        return QueueBuilder
+                .durable(PagamentoConstants.QUEUE_PAGAMENTOS_APROVADOS)
+                .build();
     }
 
     @Bean
     public Queue queuePagamentoNegado() {
-        return new Queue(PagamentoConstants.QUEUE_PAGAMENTO_NEGADO, true);
+        return QueueBuilder
+                .durable(PagamentoConstants.QUEUE_PAGAMENTO_NEGADO)
+                .build();
     }
 
     @Bean
     public Binding bindingPagamentoAprovado(Queue queuePagamentoAprovado, TopicExchange exchange) {
-        return BindingBuilder.bind(queuePagamentoAprovado).to(exchange).with(PagamentoConstants.QUEUE_PAGAMENTOS_APROVADOS);
+        return BindingBuilder
+                .bind(queuePagamentoAprovado)
+                .to(exchange)
+                .with(PagamentoConstants.QUEUE_PAGAMENTOS_APROVADOS);
     }
 
     @Bean
     public Binding bindingPagamentoNegado(Queue queuePagamentoNegado, TopicExchange exchange) {
-        return BindingBuilder.bind(queuePagamentoNegado).to(exchange).with(PagamentoConstants.QUEUE_PAGAMENTO_NEGADO);
+        return BindingBuilder
+                .bind(queuePagamentoNegado)
+                .to(exchange)
+                .with(PagamentoConstants.QUEUE_PAGAMENTO_NEGADO);
     }
 
     @Bean
