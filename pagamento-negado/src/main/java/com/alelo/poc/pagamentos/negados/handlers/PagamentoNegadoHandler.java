@@ -3,11 +3,13 @@ package com.alelo.poc.pagamentos.negados.handlers;
 
 import com.alelo.poc.clients.constants.PagamentoConstants;
 import com.alelo.poc.clients.events.PagamentoEvent;
+import com.alelo.poc.pagamentos.negados.clients.PagamentoEventTest;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
@@ -15,7 +17,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
-@RabbitListener(queues = PagamentoConstants.QUEUE_PAGAMENTO_NEGADO, concurrency = "10")
+
 @RequiredArgsConstructor
 @Slf4j
 public class PagamentoNegadoHandler {
@@ -30,8 +32,8 @@ public class PagamentoNegadoHandler {
         log.info("Total de tentativas de processamento: {}", tentativas.get());
     }
 
-    @RabbitHandler
-    public void handle(PagamentoEvent event) {
+    @RabbitListener(queues = PagamentoConstants.QUEUE_PAGAMENTO_NEGADO, concurrency = "10")
+    public void handle(@Payload PagamentoEventTest event) {
         tentativas.incrementAndGet();
         if (random.nextBoolean()) {
             throw new RuntimeException("Erro ao processar o pagamento");

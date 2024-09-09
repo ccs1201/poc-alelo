@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -14,18 +15,23 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 @Configuration
 public class AMQPConfig {
 
+    @Value("${server.message.ttl}")
+    private static int ttl;
+
     private static Queue buildQueue(String queueName) {
         return QueueBuilder
                 .durable(queueName)
                 .deadLetterExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLQ)
-                .ttl(10000)
+//                .ttl(ttl)
                 .maxPriority(10)
                 .build();
     }
 
     @Bean
     public MessageConverter jackson2JsonMessageConverter() {
-        return new Jackson2JsonMessageConverter(Jackson2ObjectMapperBuilder.json().build());
+        return new Jackson2JsonMessageConverter(Jackson2ObjectMapperBuilder
+                .json()
+                .build());
     }
 
     @Bean

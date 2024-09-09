@@ -15,13 +15,18 @@ public class AMQPConfig {
 
     @Bean
     public MessageConverter jackson2JsonMessageConverter() {
-        return new Jackson2JsonMessageConverter(new ObjectMapper()
+        var msgConverter = new Jackson2JsonMessageConverter(new ObjectMapper()
                 .registerModule(new JavaTimeModule()));
+
+        msgConverter.setAlwaysConvertToInferredType(true);
+
+        return msgConverter;
     }
 
     @Bean
     public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(
             ConnectionFactory connectionFactory, MessageConverter jackson2JsonMessageConverter) {
+
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setMessageConverter(jackson2JsonMessageConverter);
         factory.setConnectionFactory(connectionFactory);
