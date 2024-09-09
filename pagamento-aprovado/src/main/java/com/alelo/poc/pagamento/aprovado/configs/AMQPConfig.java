@@ -13,11 +13,6 @@ import org.springframework.context.annotation.Configuration;
 public class AMQPConfig {
 
     @Bean
-    public ObjectMapper objectMapper() {
-        return new ObjectMapper();
-    }
-
-    @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter(new ObjectMapper()
                 .registerModule(new JavaTimeModule()));
