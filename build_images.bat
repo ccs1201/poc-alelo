@@ -1,7 +1,8 @@
 @echo off
 setlocal enabledelayedexpansion
 
-mvn package -DskipTests=true
+REM Build do maven
+REM mvn package -DskipTests=true
 
 REM Diretórios dos módulos
 set MODULES=pagamento-aprovado pagamento-negado server

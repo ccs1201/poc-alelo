@@ -1,8 +1,6 @@
 package com.alelo.poc.server.configs;
 
 import com.alelo.poc.clients.constants.PagamentoConstants;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -11,6 +9,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 @Configuration
 public class AMQPConfig {
@@ -26,8 +25,7 @@ public class AMQPConfig {
 
     @Bean
     public MessageConverter jackson2JsonMessageConverter() {
-        return new Jackson2JsonMessageConverter(new ObjectMapper()
-                .registerModule(new JavaTimeModule()));
+        return new Jackson2JsonMessageConverter(Jackson2ObjectMapperBuilder.json().build());
     }
 
     @Bean
