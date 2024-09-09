@@ -2,12 +2,10 @@ package com.alelo.poc.pagamentos.negados.handlers;
 
 
 import com.alelo.poc.clients.constants.PagamentoConstants;
-import com.alelo.poc.clients.events.PagamentoEvent;
 import com.alelo.poc.pagamentos.negados.clients.PagamentoEventTest;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
