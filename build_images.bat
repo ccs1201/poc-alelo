@@ -5,7 +5,7 @@ REM Build do maven
 REM mvn package -DskipTests=true
 
 REM Diretórios dos módulos
-set MODULES=pagamento-aprovado pagamento-negado server
+set MODULES=pagamento-aprovado pagamento-negado pagamento-notification server
 
 REM Nome base das imagens Docker
 set IMAGE_NAME_BASE=alelo

@@ -76,6 +76,23 @@ services:
     networks:
       - poc-alelo
 
+  notification:
+    image: alelo-pagamento-notification
+    environment:
+      spring.profiles.active: prod
+    restart: no
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512MB'
+    networks:
+      - poc-alelo
+
+
 networks:
   poc-alelo:
     name: 'poc-alelo-network'

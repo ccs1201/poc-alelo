@@ -8,7 +8,6 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -18,14 +17,11 @@ import java.text.DateFormat;
 @Configuration
 public class AMQPConfig {
 
-    @Value("${server.message.ttl}")
-    private static int ttl;
-
     private static Queue buildQueue(String queueName) {
         return QueueBuilder
                 .durable(queueName)
                 .deadLetterExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLX)
-//                .ttl(ttl)
+                .ttl(10000)
                 .maxPriority(10)
                 .build();
     }
@@ -80,6 +76,19 @@ public class AMQPConfig {
                 .bind(queuePagamentoNegado)
                 .to(exchange)
                 .with(PagamentoConstants.QUEUE_PAGAMENTO_NEGADO);
+    }
+
+    @Bean
+    public Queue queueNotificacaoPagamento() {
+        return buildQueue(PagamentoConstants.QUEUE_NOTIFICACAO_PAGAMENTO);
+    }
+
+    @Bean
+    public Binding bindingNotificacaoPagamento(Queue queueNotificacaoPagamento, TopicExchange exchange) {
+        return BindingBuilder
+                .bind(queueNotificacaoPagamento)
+                .to(exchange)
+                .with(PagamentoConstants.QUEUE_NOTIFICACAO_PAGAMENTO);
     }
 
     @Bean
