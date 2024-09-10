@@ -27,7 +27,7 @@ services:
       - poc-alelo
 
   server:
-    image: couza-server
+    image: alelo-server
     restart: no
     environment:
       spring.profiles.active: prod
@@ -45,7 +45,7 @@ services:
       - poc-alelo
 
   aprovados:
-    image: couza-pagamento-aprovado
+    image: alelo-pagamento-aprovado
     environment:
       spring.profiles.active: prod
     restart: no
@@ -61,7 +61,7 @@ services:
       - poc-alelo
 
   negados:
-    image: couza-pagamento-negado
+    image: alelo-pagamento-negado
     environment:
       spring.profiles.active: prod
     restart: no

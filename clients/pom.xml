@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ccs</groupId>
-    <artifactId>clients</artifactId>
+    <artifactId>pagamento-clients</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>clients</name>
+    <name>pagamento-clients</name>
     <description>client</description>
     <packaging>jar</packaging>
 

@@ -9,9 +9,9 @@
         <relativePath> ../pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
 
-    <artifactId>server</artifactId>
+    <artifactId>pagamento-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>server</name>
+    <name>pagamento-server</name>
     <description>server</description>
 
     <properties>
@@ -21,7 +21,7 @@
 
         <dependency>
             <groupId>com.ccs</groupId>
-            <artifactId>clients</artifactId>
+            <artifactId>pagamento-clients</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

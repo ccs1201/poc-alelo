@@ -11,8 +11,8 @@
 
     <artifactId>pagamento-aprovado</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>pagamentos-aprovados</name>
-    <description>pagamentos-aprovados</description>
+    <name>pagamento-aprovados</name>
+    <description>pagamento-aprovados</description>
 
     <properties>
         <java.version>21</java.version>
@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.ccs</groupId>
-            <artifactId>clients</artifactId>
+            <artifactId>pagamento-clients</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

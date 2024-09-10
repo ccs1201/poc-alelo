@@ -8,7 +8,7 @@ REM Diretórios dos módulos
 set MODULES=pagamento-aprovado pagamento-negado server
 
 REM Nome base das imagens Docker
-set IMAGE_NAME_BASE=couza
+set IMAGE_NAME_BASE=alelo
 
 for %%M in (%MODULES%) do (
     echo Buildando imagem para o modulo %%M...
