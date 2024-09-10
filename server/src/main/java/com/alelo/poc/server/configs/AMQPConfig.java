@@ -24,7 +24,7 @@ public class AMQPConfig {
     private static Queue buildQueue(String queueName) {
         return QueueBuilder
                 .durable(queueName)
-                .deadLetterExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLQ)
+                .deadLetterExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLX)
 //                .ttl(ttl)
                 .maxPriority(10)
                 .build();
@@ -83,9 +83,9 @@ public class AMQPConfig {
     }
 
     @Bean
-    public FanoutExchange exchangeDLQ() {
+    public FanoutExchange exchangeDLX() {
         return ExchangeBuilder
-                .fanoutExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLQ)
+                .fanoutExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLX)
                 .durable(true)
                 .build();
     }
