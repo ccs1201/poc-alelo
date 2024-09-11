@@ -1,4 +1,4 @@
-package com.alelo.poc.pagamento.aprovado.configs;
+package com.alelo.poc.notification.configs.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -35,7 +35,9 @@ public class AMQPConfig {
     }
 
     @Bean
-    public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(ConnectionFactory connectionFactory,                                                                          Jackson2JsonMessageConverter jackson2JsonMessageConverter) {
+    public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(
+            ConnectionFactory connectionFactory, MessageConverter jackson2JsonMessageConverter) {
+
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setMessageConverter(jackson2JsonMessageConverter);
         factory.setConnectionFactory(connectionFactory);

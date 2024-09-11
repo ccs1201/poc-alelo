@@ -1,6 +1,7 @@
 package com.alelo.poc.server.configs;
 
 import com.alelo.poc.clients.constants.PagamentoConstants;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -11,13 +12,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
+import java.text.DateFormat;
+
 @Configuration
 public class AMQPConfig {
 
     private static Queue buildQueue(String queueName) {
         return QueueBuilder
                 .durable(queueName)
-                .deadLetterExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLQ)
+                .deadLetterExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLX)
                 .ttl(10000)
                 .maxPriority(10)
                 .build();
@@ -25,7 +28,11 @@ public class AMQPConfig {
 
     @Bean
     public MessageConverter jackson2JsonMessageConverter() {
-        return new Jackson2JsonMessageConverter(Jackson2ObjectMapperBuilder.json().build());
+        return new Jackson2JsonMessageConverter(Jackson2ObjectMapperBuilder
+                .json()
+                .dateFormat(DateFormat.getDateTimeInstance())
+                .build()
+                .setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL));
     }
 
     @Bean
@@ -72,9 +79,22 @@ public class AMQPConfig {
     }
 
     @Bean
-    public FanoutExchange exchangeDLQ() {
+    public Queue queueNotificacaoPagamento() {
+        return buildQueue(PagamentoConstants.QUEUE_NOTIFICACAO_PAGAMENTO);
+    }
+
+    @Bean
+    public Binding bindingNotificacaoPagamento(Queue queueNotificacaoPagamento, TopicExchange exchange) {
+        return BindingBuilder
+                .bind(queueNotificacaoPagamento)
+                .to(exchange)
+                .with(PagamentoConstants.QUEUE_NOTIFICACAO_PAGAMENTO);
+    }
+
+    @Bean
+    public FanoutExchange exchangeDLX() {
         return ExchangeBuilder
-                .fanoutExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLQ)
+                .fanoutExchange(PagamentoConstants.EXCHANGE_PAGAMENTO_DLX)
                 .durable(true)
                 .build();
     }
@@ -95,9 +115,10 @@ public class AMQPConfig {
     }
 
     @Bean
-    public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(ConnectionFactory connectionFactory,
-                                                                                     MessageConverter jackson2JsonMessageConverter) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+    public SimpleRabbitListenerContainerFactory simpleRabbitListenerContainerFactory(
+            ConnectionFactory connectionFactory, MessageConverter jackson2JsonMessageConverter) {
+
+        var factory = new SimpleRabbitListenerContainerFactory();
         factory.setMessageConverter(jackson2JsonMessageConverter);
         factory.setConnectionFactory(connectionFactory);
         return factory;

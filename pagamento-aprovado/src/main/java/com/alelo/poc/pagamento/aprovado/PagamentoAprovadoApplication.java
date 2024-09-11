@@ -1,13 +1,13 @@
-package com.alelo.poc.pagamentos.negados;
+package com.alelo.poc.pagamento.aprovado;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PagamentosNegadoApplication {
+public class PagamentoAprovadoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PagamentosNegadoApplication.class, args);
+        SpringApplication.run(PagamentoAprovadoApplication.class, args);
     }
 
 }

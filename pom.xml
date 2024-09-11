@@ -24,6 +24,7 @@
         <module>server</module>
         <module>pagamento-aprovado</module>
         <module>pagamento-negado</module>
+        <module>pagamento-notification</module>
     </modules>
 
     <dependencies>

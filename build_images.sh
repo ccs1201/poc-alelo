@@ -3,10 +3,10 @@
 mvn package -DskipTests=true
 
 # Diretórios dos módulos
-MODULES=("pagamento-aprovado" "pagamento-negado" "server")
+MODULES=("pagamento-aprovado" "pagamento-negado" "pagamento-notification" "server")
 
 # Nome base das imagens Docker
-IMAGE_NAME_BASE="couza"
+IMAGE_NAME_BASE="alelo"
 
 # Loop pelos módulos
 for MODULE in "${MODULES[@]}"

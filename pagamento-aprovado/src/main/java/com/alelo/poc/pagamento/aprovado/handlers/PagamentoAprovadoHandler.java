@@ -2,13 +2,16 @@ package com.alelo.poc.pagamento.aprovado.handlers;
 
 
 import com.alelo.poc.clients.constants.PagamentoConstants;
+import com.alelo.poc.clients.events.NotificationEvent;
 import com.alelo.poc.clients.events.PagamentoEvent;
+import com.alelo.poc.clients.events.enums.TipoNotificaoEnum;
 import com.alelo.poc.pagamento.aprovado.services.CashBackService;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,6 +24,7 @@ public class PagamentoAprovadoHandler {
 
     private final CashBackService cashBackService;
     private static final AtomicInteger msgProcessadosComSucesso = new AtomicInteger();
+    private final RabbitTemplate rabbitTemplate;
 
     @PreDestroy
     public void printStats() {
@@ -32,5 +36,7 @@ public class PagamentoAprovadoHandler {
         log.info("Evento recebido: {}", event);
         cashBackService.processarCashBack(event);
         msgProcessadosComSucesso.incrementAndGet();
+        rabbitTemplate.convertAndSend(PagamentoConstants.QUEUE_NOTIFICACAO_PAGAMENTO,
+                new NotificationEvent(event.idCartao(), event.valor(), TipoNotificaoEnum.PAGAMENTO_APROVADO));
     }
 }
