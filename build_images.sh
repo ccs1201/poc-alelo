@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mvn package -DskipTests=true
+mvn clean package -DskipTests=true
 
 # Diretórios dos módulos
 MODULES=("pagamento-aprovado" "pagamento-negado" "pagamento-notification" "server")

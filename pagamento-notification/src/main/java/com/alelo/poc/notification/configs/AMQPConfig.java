@@ -1,4 +1,4 @@
-package com.alelo.poc.notification.configs.configs;
+package com.alelo.poc.notification.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

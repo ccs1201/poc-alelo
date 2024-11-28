@@ -1,12 +1,19 @@
-name: 'poc-alelo'
+name: 'poc-alelo-test'
 
 services:
+
   rabbitmq:
     image: rabbitmq:3.13.6-management-alpine
     restart: no
-    container_name: 'rabbitmq_alelo'
+    container_name: 'rabbitmq-poc-test'
+    hostname: 'rabbitmq'
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      timeout: 5s
+      interval: 2s
+      retries: 3
     ports:
-      - 5672:5672
+      #      - 5672:5672
       - 15672:15672
     volumes:
       - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
@@ -16,3 +23,88 @@ services:
         limits:
           cpus: '1'
           memory: '512MB'
+    networks:
+      - poc-alelo
+
+  server:
+    image: alelo-server
+    restart: no
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    environment:
+      spring.profiles.active: prod
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '1GB'
+    networks:
+      - poc-alelo
+
+  aprovados:
+    image: alelo-pagamento-aprovado
+    environment:
+      spring.profiles.active: prod
+    restart: no
+    depends_on:
+      server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512MB'
+    networks:
+      - poc-alelo
+
+  negados:
+    image: alelo-pagamento-negado
+    environment:
+      spring.profiles.active: prod
+    restart: no
+    depends_on:
+      server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512MB'
+    networks:
+      - poc-alelo
+
+  notification:
+    image: alelo-pagamento-notification
+    environment:
+      spring.profiles.active: prod
+    restart: no
+    depends_on:
+      server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512MB'
+    networks:
+      - poc-alelo
+
+
+networks:
+  poc-alelo:
+    name: 'poc-alelo-network'
